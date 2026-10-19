@@ -1,0 +1,13 @@
+import assert from 'node:assert';
+import { hashPassword, verifyPassword, newToken, hashToken, allow, parseCookies } from '../src/security.js';
+import { validateAvatar, OPTIONS } from '../src/avatar.js';
+const h = await hashPassword('correct horse battery');
+assert(await verifyPassword('correct horse battery', h)); assert(!(await verifyPassword('wrong', h))); assert(h.startsWith('scrypt$'));
+assert(newToken().length >= 43 && hashToken('a') === hashToken('a') && hashToken('a') !== hashToken('b'));
+for (let i = 0; i < 3; i++) assert(allow('k', 3, 1000)); assert(!allow('k', 3, 1000));
+assert.deepEqual(parseCookies('a=1; sid=abc%20d'), { a: '1', sid: 'abc d' });
+const good = { v: 1, body: 1, skin: 3, hairStyle: 2, hairColor: 1, pattern: 1, shirt: 4, shirt2: 7, pants: 0, shoes: 2, hat: 2, glasses: 1 };
+assert.deepEqual(validateAvatar(good), good);
+assert(validateAvatar({ ...good, hat: 99 }) === null && validateAvatar({ ...good, skin: -1 }) === null && validateAvatar({ ...good, body: 1.5 }) === null && validateAvatar(null) === null);
+const { v, ...rest } = good; delete rest.glasses; assert(validateAvatar(rest) === null);
+console.log('UNIT_OK', Object.keys(OPTIONS).length, 'option groups');

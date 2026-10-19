@@ -1,0 +1,33 @@
+# Streaming server (MediaMTX). You send video in over RTMP; the game plays it back over HLS.
+# __STREAM_PASS__ is filled in from .env by the stream-config service in docker-compose.yml.
+logLevel: info
+rtsp: no
+webrtc: no
+srt: no
+api: no
+metrics: no
+pprof: no
+rtmp: yes
+rtmpAddress: :1935
+hls: yes
+hlsAddress: :8888
+hlsAlwaysRemux: no
+
+authInternalUsers:
+  # Reading is open inside the private Docker network. Players reach it only through Caddy, which requires sign-in.
+  - user: any
+    pass:
+    ips: []
+    permissions:
+      - action: read
+        path: live
+  # Only this user may publish, and only to the path "live".
+  - user: publisher
+    pass: __STREAM_PASS__
+    ips: []
+    permissions:
+      - action: publish
+        path: live
+
+paths:
+  live:

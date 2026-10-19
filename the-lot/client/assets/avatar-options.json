@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "body": [{"name":"Slim","w":0.86},{"name":"Regular","w":1},{"name":"Broad","w":1.16}],
+  "skin": ["#f5d7c0","#eac099","#d9a679","#c68642","#a86b3c","#8d5524","#6f4018","#4a2c12"],
+  "hairStyle": ["Bald","Short","Long","Afro","Mohawk","Bun"],
+  "hairColor": ["#1a1a1a","#4a2c12","#8b5a2b","#c9a15a","#e8d08a","#b5301f","#7a7a7a","#e8e8e8"],
+  "pattern": ["Solid","Tie-dye swirl","Rainbow tie-dye","Stripes"],
+  "shirt": ["#d62839","#f77f00","#fcbf49","#2a9d8f","#3a86ff","#8338ec","#f5f5f5","#222222"],
+  "pants": ["#2b3a67","#1b1b1b","#5c4033","#6b705c","#7d8597","#a4161a"],
+  "shoes": ["#f5f5f5","#1b1b1b","#c0392b","#3a86ff","#6b4423","#ffd166"],
+  "hat": ["None","Ball cap","Uncle Sam hat","Rose crown","Bucket hat"],
+  "glasses": ["None","Round","Shades"]
+}

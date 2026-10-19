@@ -1,0 +1,29 @@
+# DOMAIN comes from .env. With DOMAIN=localhost Caddy serves a local test certificate.
+{$DOMAIN:localhost} {
+	encode gzip
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+
+	# Live stream (HLS). Only signed-in players get through: Caddy asks the game server first.
+	@hls path /hls/*
+	handle @hls {
+		forward_auth game:3000 {
+			uri /api/auth-check
+		}
+		uri strip_prefix /hls
+		reverse_proxy stream:8888
+	}
+
+	@api path /ws /healthz /api/*
+	handle @api {
+		reverse_proxy game:3000
+	}
+
+	handle {
+		root * /srv
+		file_server
+	}
+}

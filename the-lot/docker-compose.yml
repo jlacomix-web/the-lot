@@ -1,0 +1,72 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports: ["80:80", "443:443"]
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes: [caddy_data:/data, caddy_config:/config]
+    depends_on: [game, stream]
+    restart: unless-stopped
+
+  game:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    environment:
+      PORT: "3000"
+      PUBLIC_URL: https://${DOMAIN:-localhost}
+      SMTP_URL: ${SMTP_URL:-}
+      MAIL_FROM: ${MAIL_FROM:-The Lot <no-reply@localhost>}
+      REQUIRE_EMAIL_VERIFICATION: ${REQUIRE_EMAIL_VERIFICATION:-true}
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on: [db]
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    restart: unless-stopped
+
+  # Writes the streaming server's config (with your publish password) once at start-up.
+  stream-config:
+    image: alpine:3
+    environment:
+      STREAM_PASS: ${STREAM_PASS}
+    volumes:
+      - ./stream:/tpl:ro
+      - streamcfg:/cfg
+    command: ["sh", "-c", "sed \"s/__STREAM_PASS__/$$STREAM_PASS/g\" /tpl/mediamtx.yml.template > /cfg/mediamtx.yml"]
+
+  stream:
+    image: bluenviron/mediamtx:latest
+    command: ["/cfg/mediamtx.yml"]
+    ports: ["1935:1935"]            # OBS sends video here (RTMP). Viewers use HLS through the web service.
+    volumes: [streamcfg:/cfg:ro]
+    depends_on:
+      stream-config:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # Dumps the database once a day into ./backups and deletes dumps older than BACKUP_KEEP_DAYS.
+  backup:
+    image: postgres:16-alpine
+    environment:
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    volumes:
+      - ./backups:/backups
+      - ./scripts/backup.sh:/backup.sh:ro
+    entrypoint: ["/bin/sh", "/backup.sh"]
+    depends_on: [db]
+    restart: unless-stopped
+
+volumes: { caddy_data: {}, caddy_config: {}, pgdata: {}, streamcfg: {} }

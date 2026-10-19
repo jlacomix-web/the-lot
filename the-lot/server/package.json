@@ -1,0 +1,10 @@
+{
+  "name": "the-lot-server",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node src/index.js",
+    "test": "node test/security.test.mjs && node test/game.test.mjs && node test/moderation.test.mjs",
+    "bench": "node test/bench.mjs" },
+  "dependencies": { "nodemailer": "^6.9.0", "pg": "^8.11.0", "ws": "^8.16.0" }
+}

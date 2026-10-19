@@ -1,0 +1,9 @@
+# Fetches three.js r128 and hls.js at build time so the game does not depend on a third-party CDN.
+FROM node:20-alpine AS vendor
+RUN npm install --prefix /v three@0.128.0 hls.js@1
+
+FROM caddy:2-alpine
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY client /srv
+COPY --from=vendor /v/node_modules/three/build/three.min.js /srv/vendor/three.min.js
+COPY --from=vendor /v/node_modules/hls.js/dist/hls.min.js /srv/vendor/hls.min.js

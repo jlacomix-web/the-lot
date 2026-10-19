@@ -1,0 +1,13 @@
+{
+  "hall": { "HX": 34.5, "HZ": -40, "HS": 0.75 },
+  "bounds": { "x": [-135, 135], "y": [-2, 45], "z": [-195, 115] },
+  "spawn": { "x": -18, "y": 0, "z": -40 },
+  "slope": 0.47,
+  "sections": [[-22, -8.5], [-4.5, 4.5], [8.5, 22]],
+  "levels": [
+    { "name": "Orchestra",   "edge": null,  "y0": 0.25, "rows": 20, "start": -34.3 },
+    { "name": "Mezzanine 1", "edge": -15.2, "y0": 8,    "rows": 10 },
+    { "name": "Mezzanine 2", "edge": -9.2,  "y0": 17,   "rows": 7 },
+    { "name": "Mezzanine 3", "edge": -4.2,  "y0": 25.5, "rows": 4 }
+  ]
+}
